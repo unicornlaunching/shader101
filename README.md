@@ -118,6 +118,7 @@ _No build tools or server required._
 ---
 
 ## Credits & Resources
+- [XorDev](https://www.x.com/XorDev)
 - [The Book of Shaders](https://thebookofshaders.com/)
 - [Shadertoy](https://www.shadertoy.com/)
 - [Inigo Quilez (iq)](https://iquilezles.org/)
