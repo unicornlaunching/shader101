@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oily Orb Shader Art - Learn Shaders Visually | Inspired by XorDev</title>
+    <!-- MathJax for LaTeX rendering -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            scroll-behavior: smooth;
+        }
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+        body {
+            margin: 0;
+            font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+            background: linear-gradient(135deg, #101014 0%, #23243a 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        header {
+            background: rgba(20,22,34,0.92);
+            padding: 1.5rem 1rem 1rem 1rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid #23243a;
+            transition: background 0.3s;
+        }
+        header h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 2.4rem;
+            letter-spacing: 0.01em;
+            color: #fff;
+            font-weight: 700;
+            font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+        }
+        /* Burger menu styles */
+        .burger {
+            display: block !important;
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 40px;
+            height: 40px;
+            background: none;
+            border: none;
+            z-index: 100;
+            cursor: pointer;
+        }
+        .burger span, .burger span:before, .burger span:after {
+            display: block;
+            position: absolute;
+            width: 28px;
+            height: 4px;
+            background: #fff;
+            border-radius: 2px;
+            transition: 0.3s;
+        }
+        .burger span {
+            top: 18px;
+            left: 6px;
+        }
+        .burger span:before {
+            content: '';
+            top: -10px;
+            left: 0;
+        }
+        .burger span:after {
+            content: '';
+            top: 10px;
+            left: 0;
+        }
+        /* Burger open state */
+        .burger.open span {
+            background: transparent;
+        }
+        .burger.open span:before {
+            top: 0;
+            transform: rotate(45deg);
+        }
+        .burger.open span:after {
+            top: 0;
+            transform: rotate(-45deg);
+        }
+        /* Mobile nav overlay */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 5vh;
+            margin-bottom: 5vh;
+            width: 340px;
+            max-width: 95vw;
+            max-height: 90vh;
+            height: auto;
+            overflow-y: auto;
+            background: rgba(20,22,34,0.98);
+            border-radius: 1.2rem;
+            box-shadow: 0 8px 48px 0 #000a;
+            border: 1.5px solid #23243a;
+            z-index: 99;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 1.2rem 0.5rem;
+            backdrop-filter: blur(16px);
+            transition: opacity 0.3s;
+            -webkit-overflow-scrolling: touch;
+        }
+        .mobile-nav.open {
+            display: flex;
+        }
+        .mobile-nav a {
+            color: #fff;
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin: 0.5rem 0;
+            text-decoration: none;
+            padding: 0.7em 1em;
+            border-radius: 1em;
+            transition: background 0.2s, color 0.2s;
+        }
+        .mobile-nav a:hover, .mobile-nav a:focus {
+            background: #007aff;
+            color: #fff;
+        }
+        nav {
+            display: none !important;
+        }
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1rem 4rem 1rem;
+        }
+        /* Hero section */
+        .hero {
+            width: 100%;
+            min-height: 420px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3.5rem 1.5rem 2.5rem 1.5rem;
+            background: linear-gradient(135deg, #181a2b 60%, #23243a 100%);
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 48px 0 #007aff22;
+            margin-bottom: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero h2 {
+            color: #fff;
+            font-size: 2.7rem;
+            font-weight: 700;
+            margin: 0 0 1.1rem 0;
+            text-align: center;
+            letter-spacing: 0.01em;
+            line-height: 1.15;
+        }
+        .hero p {
+            color: #e0e6f7;
+            font-size: 1.25rem;
+            max-width: 520px;
+            margin: 0 auto 2.2rem auto;
+            text-align: center;
+            line-height: 1.6;
+            padding: 0 1.5rem;
+        }
+        .hero .hero-orb {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            margin: 2.2rem auto 0 auto;
+            box-shadow: 0 8px 48px 0 #007aff55, 0 1.5px 8px 0 #0008;
+            background: transparent;
+            display: block;
+        }
+        .hero .cta-btn {
+            display: inline-block;
+            background: #007aff;
+            color: #fff;
+            font-size: 1.18rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 1.5em;
+            padding: 0.9em 2.2em;
+            margin-top: 0.5em;
+            box-shadow: 0 2px 16px #007aff33;
+            cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+        }
+        .hero .cta-btn:hover, .hero .cta-btn:focus {
+            background: #0051a8;
+            box-shadow: 0 4px 24px #007aff55;
+            transform: translateY(-2px) scale(1.04);
+            outline: none;
+        }
+        section {
+            margin-bottom: 2.5rem;
+            background: rgba(30,32,50,0.92);
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.13);
+            padding: 2.5rem 2rem 2.5rem 2rem;
+            max-width: 98vw;
+            backdrop-filter: blur(12px);
+            border: 1px solid #23243a;
+            position: relative;
+            overflow: visible;
+            transition: box-shadow 0.3s, background 0.3s;
+            animation: fadeInUp 0.7s cubic-bezier(.23,1.01,.32,1) both;
+        }
+        section h2 {
+            margin-top: 0;
+            color: #fff;
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            line-height: 1.2;
+            font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+        }
+        .orb-canvas {
+            width: 90vw;
+            max-width: 340px;
+            aspect-ratio: 1/1;
+            display: block;
+            margin: 0 auto 2.2rem auto;
+            border-radius: 50%;
+            box-shadow: 0 4px 32px 0 #007aff55, 0 1.5px 8px 0 #0002;
+            background: linear-gradient(135deg, #181a2b 60%, #23243a 100%);
+            position: relative;
+            z-index: 1;
+            border: 2.5px solid #23243a;
+            transition: box-shadow 0.3s, border 0.3s;
+        }
+        .section-content {
+            max-width: 600px;
+            width: 100%;
+            padding: 0 1.5rem;
+            margin: 0;
+            text-align: left;
+            font-size: 1.12rem;
+            line-height: 1.7;
+            color: #eafaf7;
+            font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+        }
+        .section-content p, .section-content ul {
+            margin-bottom: 1.1em;
+            font-size: 1.12rem;
+            line-height: 1.7;
+            text-align: center;
+        }
+        .section-content ul {
+            padding-left: 1.2em;
+            display: inline-block;
+            text-align: left;
+        }
+        .section-content li {
+            margin-bottom: 0.5em;
+            font-size: 1.12rem;
+            line-height: 1.7;
+            text-align: left;
+        }
+        /* MathJax block styling */
+        .section-content .math-block, .section-content .MathJax {
+            display: block;
+            font-size: 1.22em !important;
+            margin: 1.2em 0 1.2em 0;
+            text-align: center;
+            background: linear-gradient(90deg, #1a2a4a 60%, #23243a 100%);
+            border-radius: 0.7em;
+            padding: 0.7em 0.5em;
+            color: #fff;
+        }
+        /* Floating scroll-to-top button */
+        #scrollTopBtn {
+            position: fixed;
+            right: 1.2rem;
+            bottom: 1.2rem;
+            z-index: 100;
+            background: #007aff;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 52px;
+            height: 52px;
+            box-shadow: 0 2px 16px #007aff33;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0.92;
+            transition: opacity 0.2s, background 0.2s, color 0.2s;
+        }
+        #scrollTopBtn:hover, #scrollTopBtn:focus {
+            opacity: 1;
+            background: #0051a8;
+            color: #fff;
+            outline: none;
+        }
+        /* Responsive adjustments */
+        @media (max-width: 900px) {
+            /* No longer needed: nav { display: none; } .burger { display: block; } */
+        }
+        @media (min-width: 901px) {
+            /* No longer needed: .mobile-nav { display: none !important; } */
+        }
+        @media (max-width: 700px) {
+            header h1 { font-size: 1.3rem; }
+            main { padding: 1rem 0.5rem; }
+            section { padding: 1.1rem 0.3rem 1.3rem 0.3rem; }
+            .orb-canvas { max-width: 98vw; margin-bottom: 1.5rem; }
+            nav a { font-size: 1rem; padding: 0.5em 0.7em; }
+            section h2 { font-size: 1.3rem; margin-bottom: 1.1rem; }
+            .section-content, .section-content p, .section-content li { font-size: 1rem; }
+            .section-content { padding: 0 1rem; }
+            .hero h2 { font-size: 2rem; }
+            .hero p { padding: 0 1rem; }
+        }
+        @media (max-width: 480px) {
+            .orb-canvas { max-width: 96vw; margin-bottom: 1.1rem; }
+            section { padding: 0.7rem 0.1rem 1rem 0.1rem; }
+            .section-content, .section-content p, .section-content li { font-size: 0.93rem; }
+            section h2 { margin-bottom: 0.8rem; }
+            .section-content { padding: 0 0.5rem; }
+            .hero h2 { font-size: 1.3rem; }
+            .hero p { padding: 0 0.5rem; }
+        }
+        /* Accessibility: focus ring for nav */
+        nav a:focus, .mobile-nav a:focus {
+            outline: 2px solid #007aff;
+            outline-offset: 2px;
+        }
+        section:not(.hero) {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3rem 0 3rem 0;
+        }
+        section:not(.hero) h2 {
+            margin-top: 0;
+            color: #fff;
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            margin-bottom: 2rem;
+            text-align: center;
+            line-height: 1.2;
+            font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+        }
+        section:not(.hero) .orb-canvas {
+            margin: 0 0 2.5rem 0;
+        }
+        section:not(.hero) .section-content {
+            max-width: 600px;
+            width: 100%;
+            padding: 0 1.5rem;
+            margin: 0;
+            text-align: left;
+        }
+        section:not(.hero) .section-content p, 
+        section:not(.hero) .section-content ul {
+            text-align: left;
+        }
+        section:not(.hero) .section-content ul {
+            display: block;
+            padding-left: 1.2em;
+        }
+        section:not(.hero) .section-content li {
+            text-align: left;
+        }
+        @media (max-width: 700px) {
+            section:not(.hero) { padding: 2rem 0 2rem 0; }
+            section:not(.hero) h2 { font-size: 1.3rem; margin-bottom: 1.3rem; }
+            section:not(.hero) .orb-canvas { margin-bottom: 1.7rem; }
+            section:not(.hero) .section-content, 
+            section:not(.hero) .section-content p, 
+            section:not(.hero) .section-content li { font-size: 1rem; }
+            section:not(.hero) .section-content { padding: 0 1rem; }
+        }
+        @media (max-width: 480px) {
+            section:not(.hero) .orb-canvas { margin-bottom: 1.1rem; }
+            section:not(.hero) { padding: 1.2rem 0 1.2rem 0; }
+            section:not(.hero) h2 { margin-bottom: 0.8rem; }
+            section:not(.hero) .section-content, 
+            section:not(.hero) .section-content p, 
+            section:not(.hero) .section-content li { font-size: 0.93rem; }
+        }
+        header, .hero, section {
+            max-width: 700px;
+            width: 90vw;
+            margin-left: auto;
+            margin-right: auto;
+            box-sizing: border-box;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+        @media (max-width: 700px) {
+            header, .hero, section {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+        @media (max-width: 480px) {
+            header, .hero, section {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+        }
+        .section-content, .hero p {
+            padding-left: 0;
+            padding-right: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Oily Orb Shader Art</h1>
+      <h2>Exponent Labs | Inspired by XorDev</h2>
+        <button class="burger" id="burgerBtn" aria-label="Open menu"><span></span></button>
+        <nav aria-label="Section navigation">
+            <a href="#intro">Intro</a>
+            <a href="#shader">What is a Shader?</a>
+            <a href="#math">Math</a>
+            <a href="#color">Color</a>
+            <a href="#lighting">Lighting</a>
+            <a href="#animation">Animation</a>
+            <a href="#raymarching">Raymarching</a>
+            <a href="#performance">Performance</a>
+            <a href="#art">Artistic Tips</a>
+            <a href="#try">Try It</a>
+            <a href="#resources">Resources</a>
+        </nav>
+        <div class="mobile-nav" id="mobileNav" aria-label="Mobile navigation">
+            <a href="#intro">Intro</a>
+            <a href="#shader">What is a Shader?</a>
+            <a href="#math">Math</a>
+            <a href="#color">Color</a>
+            <a href="#lighting">Lighting</a>
+            <a href="#animation">Animation</a>
+            <a href="#raymarching">Raymarching</a>
+            <a href="#performance">Performance</a>
+            <a href="#art">Artistic Tips</a>
+            <a href="#try">Try It</a>
+            <a href="#resources">Resources</a>
+        </div>
+    </header>
+    <main>
+        <section class="hero">
+            <h2>Discover the Art & Math of Shaders</h2>
+            <p>Explore the intersection of creativity and mathematics. Dive into interactive, vibrant orbs and learn how artists use code and math to create mesmerizing visuals in real time.</p>
+            <button class="cta-btn" id="heroCta">Start Exploring</button>
+            <canvas class="hero-orb" id="hero-orb"></canvas>
+        </section>
+        <!-- Section 1: Introduction -->
+        <section id="intro">
+            <h2>Welcome to Oily Orb Shader Art</h2>
+            <canvas class="orb-canvas" id="orb-intro"></canvas>
+            <div class="section-content">
+                <p>
+                    This interactive landing page is your gateway to the world of real-time shader art. The "oily orb" you see is powered by mathematical beauty and creative code. Scroll down to learn how math and art blend together in the world of shaders!
+                </p>
+            </div>
+        </section>
+        <!-- Section 2: What is a Shader? -->
+        <section id="shader">
+            <h2>What is a Shader?</h2>
+            <canvas class="orb-canvas" id="orb-shader"></canvas>
+            <div class="section-content">
+                <p>
+                    A <strong>shader</strong> is a small program that runs on your graphics card, telling it how to draw every pixel. Shaders use math to create colors, shapes, and effects in real time. Artists use shaders to create everything from realistic lighting to wild, abstract visuals—like our oily orb!
+                </p>
+                <p>
+                    There are two main types: <strong>vertex shaders</strong> (which move points in space) and <strong>fragment shaders</strong> (which color each pixel). Our orb is made with a fragment shader!
+                </p>
+            </div>
+        </section>
+        <!-- Section 3: Math Behind the Orb -->
+        <section id="math">
+            <h2>Math Behind the Orb</h2>
+            <canvas class="orb-canvas" id="orb-math"></canvas>
+            <div class="section-content">
+                <p>
+                    The orb's surface is defined by a <strong>Signed Distance Function (SDF)</strong> for a sphere:
+                </p>
+                <p style="font-size:1.2em;">
+                    \[
+                        d(\vec{p}) = \lVert \vec{p} \rVert - r
+                    \]
+                </p>
+                <p>
+                    Where \(\vec{p}\) is a 3D point and \(r\) is the radius. This formula lets us "raymarch" through space to find the orb's surface, creating smooth, organic shapes.
+                </p>
+                <p>
+                    <strong>Raymarching</strong> is a technique where we "walk" along a ray, using the SDF to know how far we can safely step at each point. This is how we find the orb's surface efficiently!
+                </p>
+            </div>
+        </section>
+        <!-- Section 4: Color Theory & Palettes -->
+        <section id="color">
+            <h2>Color Theory & Palettes</h2>
+            <canvas class="orb-canvas" id="orb-color"></canvas>
+            <div class="section-content">
+                <p>
+                    Color in shaders is often generated mathematically. We use <strong>HSL (Hue, Saturation, Lightness)</strong> to create vibrant palettes. The orb's color is animated by changing the hue over time:
+                </p>
+                <p style="font-size:1.2em;">
+                    \[
+                        \text{color} = \text{hsl}(\text{hue}(t), 100\%, 50\%)
+                    \]
+                </p>
+                <p>
+                    Try experimenting with different color counts and saturations to see how the mood of the orb changes!
+                </p>
+            </div>
+        </section>
+        <!-- Section 5: Lighting & Highlights -->
+        <section id="lighting">
+            <h2>Lighting & Highlights</h2>
+            <canvas class="orb-canvas" id="orb-lighting"></canvas>
+            <div class="section-content">
+                <p>
+                    Lighting brings the orb to life! We use the <strong>Phong reflection model</strong> to simulate shiny highlights and soft ambient light:
+                </p>
+                <p style="font-size:1.2em;">
+                    \[
+                        I = k_a I_a + k_d (L \cdot N) I_l + k_s (R \cdot V)^{n}
+                    \]
+                </p>
+                <p>
+                    Where \(k_a\) is ambient, \(k_d\) is diffuse, \(k_s\) is specular, \(L\) is the light direction, \(N\) is the normal, \(R\) is the reflection, \(V\) is the view direction, and \(n\) is the shininess.
+                </p>
+            </div>
+        </section>
+        <!-- Section 6: Animating the Orb -->
+        <section id="animation">
+            <h2>Animating the Orb</h2>
+            <canvas class="orb-canvas" id="orb-animation"></canvas>
+            <div class="section-content">
+                <p>
+                    Animation in shaders is as simple as using the <code>time</code> variable! We can animate the orb's surface, color, and even its shape. For example, to pulse the orb:
+                </p>
+                <p style="font-size:1.2em;">
+                    \[
+                        r(t) = r_0 + \sin(2\pi f t) \cdot a
+                    \]
+                </p>
+                <p>
+                    Where \(r_0\) is the base radius, \(f\) is frequency, and \(a\) is amplitude. Try animating different parameters for wild effects!
+                </p>
+            </div>
+        </section>
+        <!-- Section 7: Raymarching Explained -->
+        <section id="raymarching">
+            <h2>Raymarching Explained</h2>
+            <canvas class="orb-canvas" id="orb-raymarching"></canvas>
+            <div class="section-content">
+                <p>
+                    <strong>Raymarching</strong> is a rendering technique where we "march" a ray through space, using the SDF to know how far to step. It's perfect for rendering complex, organic shapes like our orb!
+                </p>
+                <p>
+                    The key is to step by the distance to the nearest surface at each point, which is safe and efficient. If the distance is very small, we've hit the surface!
+                </p>
+                <p style="font-size:1.2em;">
+                    \[
+                        \text{next\_pos} = \text{pos} + d \cdot \text{dir}
+                    \]
+                </p>
+            </div>
+        </section>
+        <!-- Section 8: Performance & Optimization -->
+        <section id="performance">
+            <h2>Performance & Optimization</h2>
+            <canvas class="orb-canvas" id="orb-performance"></canvas>
+            <div class="section-content">
+                <p>
+                    Shaders can be fast or slow depending on how much work they do. To optimize:
+                </p>
+                <ul style="text-align:left;max-width:400px;margin:0 auto;">
+                    <li>Reduce the number of raymarching steps</li>
+                    <li>Lower the complexity of patterns</li>
+                    <li>Use lower resolution for less powerful devices</li>
+                    <li>Disable expensive effects like specular highlights</li>
+                </ul>
+                <p>
+                    <strong>Tip:</strong> Use parameters to balance quality and speed!
+                </p>
+            </div>
+        </section>
+        <!-- Section 9: Artistic Tips -->
+        <section id="art">
+            <h2>Artistic Tips</h2>
+            <canvas class="orb-canvas" id="orb-art"></canvas>
+            <div class="section-content">
+                <p>
+                    Shaders are a playground for creativity! Here are some tips for shader artists:
+                </p>
+                <ul style="text-align:left;max-width:400px;margin:0 auto;">
+                    <li>Experiment with color palettes and gradients</li>
+                    <li>Animate parameters for dynamic effects</li>
+                    <li>Combine math and randomness for organic forms</li>
+                    <li>Use lighting to add depth and realism</li>
+                    <li>Break the rules and try something wild!</li>
+                </ul>
+            </div>
+        </section>
+        <!-- Section 10: Try It Yourself! -->
+        <section id="try">
+            <h2>Try It Yourself!</h2>
+            <canvas class="orb-canvas" id="orb-try"></canvas>
+            <div class="section-content">
+                <p>
+                    Want to make your own orb? Try changing the code, or use online editors like <a href="https://www.shadertoy.com/" target="_blank">Shadertoy</a> or <a href="https://thebookofshaders.com/" target="_blank">The Book of Shaders</a> editor. Start with simple changes—like color or speed—and see what happens!
+                </p>
+                <p>
+                    <strong>Challenge:</strong> Can you make the orb look like glass, fire, or water?
+                </p>
+            </div>
+        </section>
+        <!-- Section 11: Resources -->
+        <section id="resources">
+            <h2>Resources</h2>
+            <div class="section-content">
+                <ul style="text-align:left;max-width:400px;margin:0 auto;">
+                    <li><a href="https://thebookofshaders.com/" target="_blank">The Book of Shaders</a></li>
+                    <li><a href="https://www.shadertoy.com/" target="_blank">Shadertoy</a></li>
+                    <li><a href="https://iquilezles.org/" target="_blank">Inigo Quilez (iq)</a></li>
+                    <li><a href="https://www.desmos.com/calculator" target="_blank">Desmos Graphing Calculator</a></li>
+                </ul>
+            </div>
+        </section>
+    </main>
+    <button id="scrollTopBtn" aria-label="Scroll to top" title="Scroll to top" style="display:none;">&#8679;</button>
+    <script>
+// --- Oily Orb Multi-Instance Shader Engine ---
+const orbPresets = {
+    intro: {
+        speed: 0.5, size: 0.8, intensity: 1.0, complexity: 5, colorHue: 2.0, backgroundIntensity: 0.3, colorCount: 3.0, lightIntensity: 1.0, lightHeight: 1.0, specularStrength: 1.2, ambientLight: 0.5, distortion: 1.0, rotation: 1.0, pulseSpeed: 0.0, noiseScale: 1.0, colorSaturation: 1.0, secondLightIntensity: 0.0, lightColor: 0.0, warpEffect: 0.0, resolution: 1.0, maxSteps: 60, maxComplexity: 10, enablePostProcessing: true, enableBackground: true, enableSpecular: true
+    },
+    shader: {
+        speed: 1.2, size: 0.6, intensity: 1.8, complexity: 8, colorHue: 5.0, backgroundIntensity: 0.1, colorCount: 6.0, lightIntensity: 1.8, lightHeight: 1.5, specularStrength: 2.5, ambientLight: 0.2, distortion: 1.7, rotation: 1.7, pulseSpeed: 0.7, noiseScale: 1.3, colorSaturation: 2.0, secondLightIntensity: 0.5, lightColor: 4.0, warpEffect: 0.4, resolution: 1.0, maxSteps: 80, maxComplexity: 15, enablePostProcessing: true, enableBackground: true, enableSpecular: true
+    },
+    math: {
+        speed: 0.3, size: 1.0, intensity: 0.7, complexity: 3, colorHue: 0.5, backgroundIntensity: 0.5, colorCount: 2.0, lightIntensity: 0.7, lightHeight: 0.7, specularStrength: 0.5, ambientLight: 0.8, distortion: 0.3, rotation: 0.2, pulseSpeed: 0.0, noiseScale: 0.7, colorSaturation: 0.5, secondLightIntensity: 0.0, lightColor: 1.0, warpEffect: 0.0, resolution: 1.0, maxSteps: 40, maxComplexity: 5, enablePostProcessing: false, enableBackground: true, enableSpecular: false
+    },
+    color: {
+        speed: 0.8, size: 0.7, intensity: 2.0, complexity: 10, colorHue: 3.0, backgroundIntensity: 0.2, colorCount: 8.0, lightIntensity: 1.0, lightHeight: 1.0, specularStrength: 1.0, ambientLight: 0.4, distortion: 1.8, rotation: 0.8, pulseSpeed: 0.0, noiseScale: 1.8, colorSaturation: 3.0, secondLightIntensity: 0.0, lightColor: 2.0, warpEffect: 0.2, resolution: 1.0, maxSteps: 60, maxComplexity: 12, enablePostProcessing: true, enableBackground: true, enableSpecular: false
+    },
+    lighting: {
+        speed: 0.4, size: 0.9, intensity: 1.0, complexity: 4, colorHue: 1.0, backgroundIntensity: 0.1, colorCount: 2.0, lightIntensity: 2.0, lightHeight: 2.0, specularStrength: 3.0, ambientLight: 0.1, distortion: 0.5, rotation: 0.5, pulseSpeed: 0.0, noiseScale: 0.5, colorSaturation: 1.0, secondLightIntensity: 1.0, lightColor: 5.5, warpEffect: 0.0, resolution: 1.0, maxSteps: 80, maxComplexity: 8, enablePostProcessing: true, enableBackground: false, enableSpecular: true
+    },
+    animation: {
+        speed: 2.0, size: 0.5, intensity: 1.5, complexity: 7, colorHue: 4.5, backgroundIntensity: 0.3, colorCount: 4.0, lightIntensity: 1.0, lightHeight: 1.0, specularStrength: 1.0, ambientLight: 0.3, distortion: 2.0, rotation: 2.0, pulseSpeed: 1.0, noiseScale: 2.0, colorSaturation: 2.0, secondLightIntensity: 0.0, lightColor: 3.0, warpEffect: 0.5, resolution: 1.0, maxSteps: 60, maxComplexity: 10, enablePostProcessing: true, enableBackground: true, enableSpecular: false
+    },
+    raymarching: {
+        speed: 0.2, size: 1.1, intensity: 0.6, complexity: 2, colorHue: 0.0, backgroundIntensity: 0.6, colorCount: 1.0, lightIntensity: 0.5, lightHeight: 0.5, specularStrength: 0.2, ambientLight: 1.0, distortion: 0.1, rotation: 0.1, pulseSpeed: 0.0, noiseScale: 0.5, colorSaturation: 0.2, secondLightIntensity: 0.0, lightColor: 0.0, warpEffect: 0.0, resolution: 1.0, maxSteps: 20, maxComplexity: 2, enablePostProcessing: false, enableBackground: true, enableSpecular: false
+    },
+    performance: {
+        speed: 1.5, size: 0.4, intensity: 0.8, complexity: 5, colorHue: 2.5, backgroundIntensity: 0.1, colorCount: 2.0, lightIntensity: 0.7, lightHeight: 0.7, specularStrength: 0.0, ambientLight: 0.9, distortion: 0.2, rotation: 1.5, pulseSpeed: 0.0, noiseScale: 0.6, colorSaturation: 0.5, secondLightIntensity: 0.0, lightColor: 0.0, warpEffect: 0.0, resolution: 0.5, maxSteps: 10, maxComplexity: 2, enablePostProcessing: false, enableBackground: false, enableSpecular: false
+    },
+    art: {
+        speed: 0.7, size: 0.8, intensity: 2.5, complexity: 12, colorHue: 5.5, backgroundIntensity: 0.4, colorCount: 7.0, lightIntensity: 1.5, lightHeight: 1.5, specularStrength: 2.0, ambientLight: 0.2, distortion: 2.0, rotation: 1.2, pulseSpeed: 0.5, noiseScale: 1.7, colorSaturation: 2.5, secondLightIntensity: 0.5, lightColor: 1.5, warpEffect: 0.4, resolution: 1.0, maxSteps: 90, maxComplexity: 18, enablePostProcessing: true, enableBackground: true, enableSpecular: true
+    },
+    try: {
+        speed: 1.0, size: 0.7, intensity: 1.0, complexity: 6, colorHue: 3.0, backgroundIntensity: 0.2, colorCount: 5.0, lightIntensity: 1.0, lightHeight: 1.0, specularStrength: 1.0, ambientLight: 0.5, distortion: 1.0, rotation: 1.0, pulseSpeed: 0.0, noiseScale: 1.0, colorSaturation: 1.0, secondLightIntensity: 0.0, lightColor: 0.0, warpEffect: 0.0, resolution: 1.0, maxSteps: 60, maxComplexity: 10, enablePostProcessing: true, enableBackground: true, enableSpecular: true
+    }
+};
+
+// --- Shader code (vertex and fragment) ---
+const vertexShaderSource = `
+    attribute vec2 a_position;
+    void main() {
+        gl_Position = vec4(a_position, 0.0, 1.0);
+    }
+`;
+const fragmentShaderSource = `
+    precision highp float;
+    uniform vec2 u_resolution;
+    uniform float u_time;
+    uniform float u_speed;
+    uniform float u_size;
+    uniform float u_intensity;
+    uniform float u_complexity;
+    uniform float u_colorHue;
+    uniform float u_backgroundIntensity;
+    uniform float u_colorCount;
+    uniform float u_lightIntensity;
+    uniform float u_lightHeight;
+    uniform float u_specularStrength;
+    uniform float u_ambientLight;
+    uniform float u_distortion;
+    uniform float u_rotation;
+    uniform float u_pulseSpeed;
+    uniform float u_noiseScale;
+    uniform float u_colorSaturation;
+    uniform float u_secondLightIntensity;
+    uniform float u_lightColor;
+    uniform float u_warpEffect;
+    uniform float u_maxSteps;
+    uniform float u_maxComplexity;
+    uniform bool u_enablePostProcessing;
+    uniform bool u_enableBackground;
+    uniform bool u_enableSpecular;
+    // Custom tanh approximation
+    vec3 customTanh(vec3 x) {
+        return clamp(x / (1.0 + abs(x)), -1.0, 1.0);
+    }
+    float hash(vec3 p) {
+        p = fract(p * vec3(443.8975, 397.2973, 491.1871));
+        p += dot(p.zxy, p.yxz + 19.27);
+        return fract(p.x * p.y * p.z);
+    }
+    float sdSphere(vec3 p, float t) {
+        float pulse = 1.0 + sin(t * u_pulseSpeed * 2.0) * 0.05 * u_pulseSpeed;
+        return length(p) - (u_size * pulse);
+    }
+    float noise(vec3 p) {
+        p *= u_noiseScale;
+        vec3 i = floor(p);
+        vec3 f = fract(p);
+        f = f * f * (3.0 - 2.0 * f);
+        float n = mix(
+            mix(
+                mix(hash(i), hash(i + vec3(1,0,0)), f.x),
+                mix(hash(i + vec3(0,1,0)), hash(i + vec3(1,1,0)), f.x),
+                f.y
+            ),
+            mix(
+                mix(hash(i + vec3(0,0,1)), hash(i + vec3(1,0,1)), f.x),
+                mix(hash(i + vec3(0,1,1)), hash(i + vec3(1,1,1)), f.x),
+                f.y
+            ),
+            f.z
+        );
+        return n;
+    }
+    float sceneSDF(vec3 p, float t) {
+        if (u_warpEffect > 0.0) {
+            float noiseFactor = noise(p * 2.0 + t) * u_warpEffect;
+            p += sin(p * 3.0 + t) * noiseFactor;
+        }
+        return sdSphere(p, t);
+    }
+    float raymarch(vec3 ro, vec3 rd, float t) {
+        float d = 0.0;
+        int maxSteps = int(u_maxSteps);
+        for (int i = 0; i < 100; i++) {
+            if (i >= maxSteps) break;
+            vec3 p = ro + rd * d;
+            float dist = sceneSDF(p, t);
+            if (dist < 0.0001 || d > 10.0) break;
+            d += dist * 0.3;
+        }
+        return d;
+    }
+    vec3 calcNormal(vec3 p, float t) {
+        vec2 e = vec2(0.0001, 0.0);
+        return normalize(vec3(
+            sceneSDF(p + e.xyy, t) - sceneSDF(p - e.xyy, t),
+            sceneSDF(p + e.yxy, t) - sceneSDF(p - e.yxy, t),
+            sceneSDF(p + e.yyx, t) - sceneSDF(p - e.yyx, t)
+        ));
+    }
+    void main() {
+        vec2 uv = gl_FragCoord.xy / u_resolution.xy * 2.0 - 1.0;
+        uv.x *= u_resolution.x / u_resolution.y;
+        vec3 color = vec3(0.0);
+        float t = u_time * u_speed;
+        vec3 ro = vec3(0.0, 0.0, 2.0);
+        vec3 rd = normalize(vec3(uv, -1.0));
+        float d = raymarch(ro, rd, t);
+        if (d < 10.0) {
+            vec3 p = ro + rd * d;
+            vec3 normal = calcNormal(p, t);
+            vec3 v = p;
+            float z = 0.0;
+            float iterations = u_complexity;
+            if (iterations > u_maxComplexity) {
+                iterations = u_maxComplexity;
+            }
+            for (float i = 0.0; i < 20.0; i++) {
+                if (i >= iterations) break;
+                float angle = t * u_rotation + i * 0.1;
+                float cosAngle = cos(angle);
+                float sinAngle = sin(angle);
+                mat3 rot = mat3(
+                    cosAngle, 0.0, sinAngle,
+                    0.0, 1.0, 0.0,
+                    -sinAngle, 0.0, cosAngle
+                );
+                p = rot * p;
+                float d_iter = 1.0;
+                for (float j = 0.0; j < 5.0; j++) {
+                    p += sin(p.yzx * d_iter) / (d_iter / u_distortion);
+                    d_iter += d_iter;
+                }
+                float theta = atan(p.x, p.z);
+                float cosPy = cos(5.0 * p.y + theta + t);
+                z += d_iter = 0.2 * max(0.03 + abs(cosPy) * 0.1, length(v) - 1.0);
+                float colorFreq = 0.4 / max(0.2, u_colorCount * 0.1);
+                vec3 colorPhase = vec3(
+                    u_colorHue + sin(t * 0.1), 
+                    u_colorHue - 1.0 + cos(t * 0.1), 
+                    u_colorHue - 2.0
+                );
+                vec3 rawColor = cos(cosPy / colorFreq + p.y + colorPhase);
+                vec3 grayscale = vec3(dot(rawColor, vec3(0.299, 0.587, 0.114)));
+                vec3 saturatedColor = mix(grayscale, rawColor, u_colorSaturation);
+                color += (saturatedColor + 1.5) * 50.0 / z;
+            }
+            color *= u_intensity;
+            vec3 lightDir = normalize(vec3(sin(t), u_lightHeight, cos(t)));
+            vec3 lightDir2 = normalize(vec3(cos(t * 0.7), -u_lightHeight, sin(t * 0.7)));
+            vec3 lightColor = vec3(
+                0.5 + 0.5 * sin(u_lightColor),
+                0.5 + 0.5 * sin(u_lightColor + 2.0),
+                0.5 + 0.5 * sin(u_lightColor + 4.0)
+            );
+            float diff = max(dot(normal, lightDir), 0.0) * 2.0 * u_lightIntensity;
+            float diff2 = max(dot(normal, lightDir2), 0.0) * 2.0 * u_secondLightIntensity;
+            float spec = 0.0;
+            if (u_enableSpecular) {
+                spec = pow(max(dot(reflect(-lightDir, normal), -rd), 0.0), 48.0) * u_specularStrength;
+            }
+            float ambient = u_ambientLight;
+            color = color * (diff * lightColor + diff2 + ambient);
+            if (u_enableSpecular) {
+                color += vec3(spec);
+            }
+        }
+        if (u_enableBackground) {
+            vec3 bg = vec3(0.1, 0.1, 0.3) * (1.0 + noise(vec3(uv * 5.0, t)) * 0.2) * u_backgroundIntensity;
+            color += bg * (1.0 - smoothstep(0.0, 5.0, d));
+        }
+        color = customTanh(color / 20000.0);
+        if (u_enablePostProcessing) {
+            float vignette = 1.0 - smoothstep(0.5, 1.5, length(uv));
+            color *= vignette;
+            color = mix(color, color * vec3(1.05, 1.0, 0.95), 0.5);
+            color.r += uv.x * 0.01;
+            color.b -= uv.x * 0.01;
+        }
+        gl_FragColor = vec4(color, 1.0);
+    }
+`;
+
+function createShader(gl, type, source) {
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        gl.deleteShader(shader);
+        return null;
+    }
+    return shader;
+}
+function createOrb(canvas, params) {
+    const gl = canvas.getContext('webgl');
+    if (!gl) {
+        canvas.parentNode.innerHTML = '<div style="color:red;text-align:center;padding:2em;">WebGL not supported</div>';
+        return;
+    }
+    const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+    const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+    if (!vertexShader || !fragmentShader) {
+        canvas.parentNode.innerHTML = '<div style="color:red;text-align:center;padding:2em;">Shader compile error</div>';
+        return;
+    }
+    const program = gl.createProgram();
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        canvas.parentNode.innerHTML = '<div style="color:red;text-align:center;padding:2em;">Shader link error</div>';
+        return;
+    }
+    gl.useProgram(program);
+    const positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+        -1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1
+    ]), gl.STATIC_DRAW);
+    const positionLocation = gl.getAttribLocation(program, 'a_position');
+    gl.enableVertexAttribArray(positionLocation);
+    gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+    // Uniform locations
+    const uniforms = {};
+    [
+        'u_resolution','u_time','u_speed','u_size','u_intensity','u_complexity','u_colorHue','u_backgroundIntensity','u_colorCount','u_lightIntensity','u_lightHeight','u_specularStrength','u_ambientLight','u_distortion','u_rotation','u_pulseSpeed','u_noiseScale','u_colorSaturation','u_secondLightIntensity','u_lightColor','u_warpEffect','u_maxSteps','u_maxComplexity','u_enablePostProcessing','u_enableBackground','u_enableSpecular'
+    ].forEach(name => {
+        uniforms[name] = gl.getUniformLocation(program, name);
+    });
+    // Resize canvas
+    function resize() {
+        const dpr = window.devicePixelRatio || 1.0;
+        const w = canvas.clientWidth * dpr;
+        const h = canvas.clientHeight * dpr;
+        if (canvas.width !== w || canvas.height !== h) {
+            canvas.width = w;
+            canvas.height = h;
+            gl.viewport(0, 0, w, h);
+        }
+    }
+    let time = 0;
+    function render(now) {
+        resize();
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.uniform2f(uniforms.u_resolution, canvas.width, canvas.height);
+        gl.uniform1f(uniforms.u_time, time);
+        Object.entries(params).forEach(([k, v]) => {
+            if (uniforms['u_' + k] === undefined || uniforms['u_' + k] === null) return;
+            if (typeof v === 'boolean') {
+                gl.uniform1i(uniforms['u_' + k], v ? 1 : 0);
+            } else {
+                gl.uniform1f(uniforms['u_' + k], v);
+            }
+        });
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        time += 0.016;
+        requestAnimationFrame(render);
+    }
+    requestAnimationFrame(render);
+}
+// Attach orbs to all orb-canvas elements
+window.addEventListener('DOMContentLoaded', () => {
+    [
+        ['orb-intro', orbPresets.intro],
+        ['orb-shader', orbPresets.shader],
+        ['orb-math', orbPresets.math],
+        ['orb-color', orbPresets.color],
+        ['orb-lighting', orbPresets.lighting],
+        ['orb-animation', orbPresets.animation],
+        ['orb-raymarching', orbPresets.raymarching],
+        ['orb-performance', orbPresets.performance],
+        ['orb-art', orbPresets.art],
+        ['orb-try', orbPresets.try]
+    ].forEach(([id, params]) => {
+        const canvas = document.getElementById(id);
+        if (canvas) createOrb(canvas, params);
+    });
+    // Add hero orb
+    if (window.createOrb) {
+        const heroOrbParams = {
+            speed: 1.1, size: 1.0, intensity: 1.7, complexity: 8, colorHue: 4.2, backgroundIntensity: 0.18, colorCount: 6.0, lightIntensity: 1.7, lightHeight: 1.3, specularStrength: 2.0, ambientLight: 0.3, distortion: 1.5, rotation: 1.2, pulseSpeed: 0.5, noiseScale: 1.2, colorSaturation: 2.0, secondLightIntensity: 0.3, lightColor: 3.5, warpEffect: 0.3, resolution: 1.0, maxSteps: 80, maxComplexity: 12, enablePostProcessing: true, enableBackground: true, enableSpecular: true
+        };
+        const heroOrb = document.getElementById('hero-orb');
+        if (heroOrb) createOrb(heroOrb, heroOrbParams);
+    }
+});
+// --- Burger menu logic ---
+const burgerBtn = document.getElementById('burgerBtn');
+const mobileNav = document.getElementById('mobileNav');
+let menuOpen = false;
+function closeMenu() {
+    burgerBtn.classList.remove('open');
+    mobileNav.classList.remove('open');
+    menuOpen = false;
+}
+burgerBtn.addEventListener('click', () => {
+    menuOpen = !menuOpen;
+    burgerBtn.classList.toggle('open', menuOpen);
+    mobileNav.classList.toggle('open', menuOpen);
+});
+// Close menu on nav link click
+mobileNav.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', closeMenu);
+});
+// Close menu on outside click
+window.addEventListener('click', (e) => {
+    if (menuOpen && !mobileNav.contains(e.target) && e.target !== burgerBtn && !burgerBtn.contains(e.target)) {
+        closeMenu();
+    }
+});
+// --- Hero CTA scroll ---
+document.getElementById('heroCta').addEventListener('click', function() {
+    const firstSection = document.querySelector('main > section:not(.hero)');
+    if (firstSection) {
+        firstSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+});
+// --- Scroll-to-top button logic ---
+const scrollBtn = document.getElementById('scrollTopBtn');
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) {
+        scrollBtn.style.display = 'flex';
+    } else {
+        scrollBtn.style.display = 'none';
+    }
+});
+scrollBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth', block: 'start' });
+});
+    </script>
+</body>
+</html>
